@@ -184,26 +184,38 @@ function authErrorMessage(code) {
 }
 
 signinBtn.addEventListener('click', async () => {
-  const email    = authEmail.value.trim();
-  const password = authPassword.value;
-  if (!email || !password) return;
+  const email    = (authEmail.value || '').trim();
+  const password = authPassword.value || '';
   authError.textContent = '';
+  if (!email || !password) {
+    authError.textContent = 'Please enter your email and password.';
+    return;
+  }
+  signinBtn.disabled = true;
   try {
     await signInWithEmailAndPassword(auth, email, password);
   } catch (e) {
     authError.textContent = authErrorMessage(e.code);
+  } finally {
+    signinBtn.disabled = false;
   }
 });
 
 signupBtn.addEventListener('click', async () => {
-  const email    = authEmail.value.trim();
-  const password = authPassword.value;
-  if (!email || !password) return;
+  const email    = (authEmail.value || '').trim();
+  const password = authPassword.value || '';
   authError.textContent = '';
+  if (!email || !password) {
+    authError.textContent = 'Please enter your email and password.';
+    return;
+  }
+  signupBtn.disabled = true;
   try {
     await createUserWithEmailAndPassword(auth, email, password);
   } catch (e) {
     authError.textContent = authErrorMessage(e.code);
+  } finally {
+    signupBtn.disabled = false;
   }
 });
 
