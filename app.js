@@ -159,14 +159,14 @@ async function saveEntry() {
 
 function showAuthScreen() {
   diary.classList.add('hidden');
-  authScreen.classList.remove('hidden');
+  authScreen.style.display = '';
   authError.textContent = '';
   authEmail.value    = '';
   authPassword.value = '';
 }
 
 function showDiary(uid) {
-  authScreen.classList.add('hidden');
+  authScreen.style.display = 'none';
   diary.classList.remove('hidden');
   loadAndRender(uid);
 }
