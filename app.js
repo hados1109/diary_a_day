@@ -254,7 +254,10 @@ forgotPasswordBtn.addEventListener('click', async () => {
 
   forgotPasswordBtn.disabled = true;
   try {
-    await sendPasswordResetEmail(auth, email);
+    await sendPasswordResetEmail(auth, email, {
+      url: 'https://smiletoday.vercel.app',
+      handleCodeInApp: true,
+    });
     authSuccess.textContent = 'Reset link sent! Check your inbox.';
   } catch (e) {
     if (e.code === 'auth/user-not-found') {
