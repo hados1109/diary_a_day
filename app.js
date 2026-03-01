@@ -1,57 +1,89 @@
-const STORAGE_KEY = 'positivity-note-entries';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from 'https://www.gstatic.com/firebasejs/11.3.1/firebase-auth.js';
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  serverTimestamp,
+} from 'https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js';
 
-const addBtnWrap = document.getElementById('add-btn-wrap');
-const addBtn = document.getElementById('add-btn');
-const editor = document.getElementById('editor');
-const editorDate = document.getElementById('editor-date');
+const firebaseConfig = {
+  apiKey: "AIzaSyCvlsiGh78XZeBs86qZj0gNyCv4p0_GB6k",
+  authDomain: "diary-a-day.firebaseapp.com",
+  projectId: "diary-a-day",
+  storageBucket: "diary-a-day.firebasestorage.app",
+  messagingSenderId: "217753986789",
+  appId: "1:217753986789:web:a398ec34736d06e254d60c",
+  measurementId: "G-W326BD09BF",
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db   = getFirestore(firebaseApp);
+
+// ── DOM refs ──────────────────────────────────────────────
+
+const authScreen   = document.getElementById('auth-screen');
+const diary        = document.getElementById('diary');
+const authEmail    = document.getElementById('auth-email');
+const authPassword = document.getElementById('auth-password');
+const signinBtn    = document.getElementById('signin-btn');
+const signupBtn    = document.getElementById('signup-btn');
+const authError    = document.getElementById('auth-error');
+const logoutBtn    = document.getElementById('logout-btn');
+
+const addBtnWrap  = document.getElementById('add-btn-wrap');
+const addBtn      = document.getElementById('add-btn');
+const editor      = document.getElementById('editor');
+const editorDate  = document.getElementById('editor-date');
 const editorInput = document.getElementById('editor-input');
-const saveBtn = document.getElementById('save-btn');
-const deleteBtn = document.getElementById('delete-btn');
+const saveBtn     = document.getElementById('save-btn');
+const deleteBtn   = document.getElementById('delete-btn');
 const entriesList = document.getElementById('entries-list');
 
 // ── Helpers ──────────────────────────────────────────────
 
 function todayString() {
   const d = new Date();
-  const dd = String(d.getDate()).padStart(2, '0');
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd   = String(d.getDate()).padStart(2, '0');
+  const mm   = String(d.getMonth() + 1).padStart(2, '0');
   const yyyy = d.getFullYear();
   return `${dd}/${mm}/${yyyy}`;
 }
 
-function loadEntries() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    return [];
-  }
+// ── Firestore ─────────────────────────────────────────────
+
+function entriesRef(uid) {
+  return collection(db, 'users', uid, 'entries');
 }
 
-function saveEntries(entries) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+async function loadEntries(uid) {
+  const q    = query(entriesRef(uid), orderBy('createdAt', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
-// ── Auto-resize textarea ──────────────────────────────────
-
-function autoResize() {
-  editorInput.style.height = '22px';
-  editorInput.style.height = editorInput.scrollHeight + 'px';
+async function addEntry(uid, date, text) {
+  await addDoc(entriesRef(uid), { date, text, createdAt: serverTimestamp() });
 }
-
-editorInput.addEventListener('input', autoResize);
 
 // ── Render ────────────────────────────────────────────────
 
-function render() {
-  const entries = loadEntries();
-
-  addBtnWrap.classList.remove('hidden');
-  addBtn.disabled = false;
-
+function render(entries) {
   entriesList.innerHTML = '';
 
   const groups = [];
-  const seen = new Map();
+  const seen   = new Map();
+
   entries.forEach(entry => {
     if (!seen.has(entry.date)) {
       const texts = [];
@@ -79,6 +111,20 @@ function render() {
   });
 }
 
+async function loadAndRender(uid) {
+  const entries = await loadEntries(uid);
+  render(entries);
+}
+
+// ── Auto-resize textarea ──────────────────────────────────
+
+function autoResize() {
+  editorInput.style.height = '22px';
+  editorInput.style.height = editorInput.scrollHeight + 'px';
+}
+
+editorInput.addEventListener('input', autoResize);
+
 // ── Editor open / close ───────────────────────────────────
 
 function openEditor() {
@@ -94,29 +140,85 @@ function closeEditor() {
   editor.classList.add('hidden');
   editorInput.value = '';
   editorInput.style.height = '22px';
-  render();
+  const uid = auth.currentUser?.uid;
+  if (uid) loadAndRender(uid);
 }
 
 // ── Save ──────────────────────────────────────────────────
 
-function saveEntry() {
+async function saveEntry() {
   const text = editorInput.value.trim();
   if (!text) return;
-
-  const entries = loadEntries();
-  entries.unshift({ date: todayString(), text });
-  saveEntries(entries);
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+  await addEntry(uid, todayString(), text);
   closeEditor();
 }
 
-// ── Event listeners ───────────────────────────────────────
+// ── Auth ──────────────────────────────────────────────────
+
+function showAuthScreen() {
+  diary.classList.add('hidden');
+  authScreen.classList.remove('hidden');
+  authError.textContent = '';
+  authEmail.value    = '';
+  authPassword.value = '';
+}
+
+function showDiary(uid) {
+  authScreen.classList.add('hidden');
+  diary.classList.remove('hidden');
+  loadAndRender(uid);
+}
+
+function authErrorMessage(code) {
+  switch (code) {
+    case 'auth/invalid-email':        return 'Invalid email address.';
+    case 'auth/user-not-found':       return 'No account with that email.';
+    case 'auth/wrong-password':       return 'Incorrect password.';
+    case 'auth/email-already-in-use': return 'Email already in use.';
+    case 'auth/weak-password':        return 'Password must be at least 6 characters.';
+    case 'auth/invalid-credential':   return 'Incorrect email or password.';
+    default:                          return 'Something went wrong. Try again.';
+  }
+}
+
+signinBtn.addEventListener('click', async () => {
+  const email    = authEmail.value.trim();
+  const password = authPassword.value;
+  if (!email || !password) return;
+  authError.textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (e) {
+    authError.textContent = authErrorMessage(e.code);
+  }
+});
+
+signupBtn.addEventListener('click', async () => {
+  const email    = authEmail.value.trim();
+  const password = authPassword.value;
+  if (!email || !password) return;
+  authError.textContent = '';
+  try {
+    await createUserWithEmailAndPassword(auth, email, password);
+  } catch (e) {
+    authError.textContent = authErrorMessage(e.code);
+  }
+});
+
+logoutBtn.addEventListener('click', () => signOut(auth));
+
+// ── Diary event listeners ─────────────────────────────────
 
 addBtn.addEventListener('click', openEditor);
 saveBtn.addEventListener('click', saveEntry);
 deleteBtn.addEventListener('click', closeEditor);
 
 document.addEventListener('keydown', e => {
-  const tag = document.activeElement.tagName.toLowerCase();
+  if (diary.classList.contains('hidden')) return;
+
+  const tag        = document.activeElement.tagName.toLowerCase();
   const inTextarea = tag === 'textarea' || tag === 'input';
 
   if (!inTextarea && e.key === 'n' && !e.metaKey && !e.ctrlKey && !e.altKey) {
@@ -139,4 +241,10 @@ document.addEventListener('keydown', e => {
 
 // ── Init ──────────────────────────────────────────────────
 
-render();
+onAuthStateChanged(auth, user => {
+  if (user) {
+    showDiary(user.uid);
+  } else {
+    showAuthScreen();
+  }
+});

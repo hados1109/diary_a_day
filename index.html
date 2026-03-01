@@ -7,7 +7,20 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main class="container">
+
+    <div id="auth-screen">
+      <div class="auth-container">
+        <input id="auth-email" type="email" placeholder="email" autocomplete="email" />
+        <input id="auth-password" type="password" placeholder="password" autocomplete="current-password" />
+        <div class="auth-actions">
+          <button id="signin-btn">Sign in</button>
+          <button id="signup-btn">Sign up</button>
+        </div>
+        <p id="auth-error"></p>
+      </div>
+    </div>
+
+    <main class="container hidden" id="diary">
       <div id="add-btn-wrap">
         <button id="add-btn" title="New entry (N)">+</button>
       </div>
@@ -22,8 +35,10 @@
       </div>
 
       <div id="entries-list"></div>
+
+      <button id="logout-btn">Sign out</button>
     </main>
 
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>
