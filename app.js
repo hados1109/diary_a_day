@@ -268,13 +268,14 @@ forgotPasswordBtn.addEventListener('click', async () => {
   } catch (e) {
     // #region agent log
     fetch('http://127.0.0.1:7461/ingest/30a62fb0-da3f-4451-9a45-b37341cc664f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'db6744'},body:JSON.stringify({sessionId:'db6744',location:'app.js:sendPasswordResetEmail-catch',message:'sendPasswordResetEmail threw error',data:{code:e.code,message:e.message,name:e.name},timestamp:Date.now(),hypothesisId:'H-A H-B H-C H-D H-E'})}).catch(()=>{});
+    console.error('[debug-db6744] sendPasswordResetEmail error', {code: e.code, message: e.message});
     // #endregion
     if (e.code === 'auth/user-not-found') {
       authError.textContent = 'No account found with that email.';
     } else if (e.code === 'auth/invalid-email') {
       authError.textContent = 'Invalid email address.';
     } else {
-      authError.textContent = 'Could not send reset email. Try again.';
+      authError.textContent = `Could not send reset email. [${e.code}]`;
     }
   } finally {
     forgotPasswordBtn.disabled = false;
