@@ -171,7 +171,8 @@ function showAuthScreen() {
 function showDiary(uid) {
   authScreen.style.display = 'none';
   diary.classList.remove('hidden');
-  userEmail.textContent = auth.currentUser?.email ?? '';
+  const email = auth.currentUser?.email ?? '';
+  userEmail.textContent = email.split('@')[0];
   loadAndRender(uid);
 }
 
