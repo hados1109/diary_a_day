@@ -254,12 +254,21 @@ forgotPasswordBtn.addEventListener('click', async () => {
 
   forgotPasswordBtn.disabled = true;
   try {
+    // #region agent log
+    fetch('http://127.0.0.1:7461/ingest/30a62fb0-da3f-4451-9a45-b37341cc664f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'db6744'},body:JSON.stringify({sessionId:'db6744',location:'app.js:sendPasswordResetEmail-before',message:'Attempting sendPasswordResetEmail',data:{email,handleCodeInApp:true,url:'https://smiletoday.vercel.app'},timestamp:Date.now(),hypothesisId:'all'})}).catch(()=>{});
+    // #endregion
     await sendPasswordResetEmail(auth, email, {
       url: 'https://smiletoday.vercel.app',
       handleCodeInApp: true,
     });
+    // #region agent log
+    fetch('http://127.0.0.1:7461/ingest/30a62fb0-da3f-4451-9a45-b37341cc664f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'db6744'},body:JSON.stringify({sessionId:'db6744',location:'app.js:sendPasswordResetEmail-success',message:'sendPasswordResetEmail succeeded',data:{email},timestamp:Date.now(),hypothesisId:'all'})}).catch(()=>{});
+    // #endregion
     authSuccess.textContent = 'Reset link sent! Check your inbox.';
   } catch (e) {
+    // #region agent log
+    fetch('http://127.0.0.1:7461/ingest/30a62fb0-da3f-4451-9a45-b37341cc664f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'db6744'},body:JSON.stringify({sessionId:'db6744',location:'app.js:sendPasswordResetEmail-catch',message:'sendPasswordResetEmail threw error',data:{code:e.code,message:e.message,name:e.name},timestamp:Date.now(),hypothesisId:'H-A H-B H-C H-D H-E'})}).catch(()=>{});
+    // #endregion
     if (e.code === 'auth/user-not-found') {
       authError.textContent = 'No account found with that email.';
     } else if (e.code === 'auth/invalid-email') {
