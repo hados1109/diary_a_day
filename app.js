@@ -32,14 +32,17 @@ const db   = getFirestore(firebaseApp);
 
 // ── DOM refs ──────────────────────────────────────────────
 
-const authScreen   = document.getElementById('auth-screen');
-const diary        = document.getElementById('diary');
-const authEmail    = document.getElementById('auth-email');
-const authPassword = document.getElementById('auth-password');
-const signinBtn    = document.getElementById('signin-btn');
-const signupBtn    = document.getElementById('signup-btn');
-const authError    = document.getElementById('auth-error');
-const logoutBtn    = document.getElementById('logout-btn');
+const authScreen     = document.getElementById('auth-screen');
+const diary          = document.getElementById('diary');
+const authEmail      = document.getElementById('auth-email');
+const authPassword   = document.getElementById('auth-password');
+const authSubmitBtn  = document.getElementById('auth-submit-btn');
+const authModeToggle = document.getElementById('auth-mode-toggle');
+const toggleLogin    = document.getElementById('toggle-login');
+const toggleSignup   = document.getElementById('toggle-signup');
+const authError      = document.getElementById('auth-error');
+const logoutBtn      = document.getElementById('logout-btn');
+const userEmail      = document.getElementById('user-email');
 
 const addBtnWrap  = document.getElementById('add-btn-wrap');
 const addBtn      = document.getElementById('add-btn');
@@ -160,14 +163,15 @@ async function saveEntry() {
 function showAuthScreen() {
   diary.classList.add('hidden');
   authScreen.style.display = '';
-  authError.textContent = '';
   authEmail.value    = '';
   authPassword.value = '';
+  setAuthMode('login');
 }
 
 function showDiary(uid) {
   authScreen.style.display = 'none';
   diary.classList.remove('hidden');
+  userEmail.textContent = auth.currentUser?.email ?? '';
   loadAndRender(uid);
 }
 
@@ -183,25 +187,36 @@ function authErrorMessage(code) {
   }
 }
 
-signinBtn.addEventListener('click', async () => {
-  const email    = (authEmail.value || '').trim();
-  const password = authPassword.value || '';
+// ── Auth mode toggle ──────────────────────────────────────
+
+let authMode = 'login';
+
+function setAuthMode(mode) {
+  authMode = mode;
+  if (mode === 'signup') {
+    authModeToggle.classList.add('signup');
+    authModeToggle.setAttribute('aria-checked', 'true');
+    toggleLogin.classList.remove('active');
+    toggleSignup.classList.add('active');
+    authSubmitBtn.textContent = 'Sign up';
+  } else {
+    authModeToggle.classList.remove('signup');
+    authModeToggle.setAttribute('aria-checked', 'false');
+    toggleLogin.classList.add('active');
+    toggleSignup.classList.remove('active');
+    authSubmitBtn.textContent = 'Log in';
+  }
   authError.textContent = '';
-  if (!email || !password) {
-    authError.textContent = 'Please enter your email and password.';
-    return;
-  }
-  signinBtn.disabled = true;
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (e) {
-    authError.textContent = authErrorMessage(e.code);
-  } finally {
-    signinBtn.disabled = false;
-  }
+}
+
+authModeToggle.addEventListener('click', () => {
+  setAuthMode(authMode === 'login' ? 'signup' : 'login');
 });
 
-signupBtn.addEventListener('click', async () => {
+toggleLogin.addEventListener('click', () => setAuthMode('login'));
+toggleSignup.addEventListener('click', () => setAuthMode('signup'));
+
+authSubmitBtn.addEventListener('click', async () => {
   const email    = (authEmail.value || '').trim();
   const password = authPassword.value || '';
   authError.textContent = '';
@@ -209,13 +224,17 @@ signupBtn.addEventListener('click', async () => {
     authError.textContent = 'Please enter your email and password.';
     return;
   }
-  signupBtn.disabled = true;
+  authSubmitBtn.disabled = true;
   try {
-    await createUserWithEmailAndPassword(auth, email, password);
+    if (authMode === 'signup') {
+      await createUserWithEmailAndPassword(auth, email, password);
+    } else {
+      await signInWithEmailAndPassword(auth, email, password);
+    }
   } catch (e) {
     authError.textContent = authErrorMessage(e.code);
   } finally {
-    signupBtn.disabled = false;
+    authSubmitBtn.disabled = false;
   }
 });
 

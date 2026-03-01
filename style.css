@@ -189,7 +189,51 @@ body {
   padding: 48px 24px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0;
+}
+
+.auth-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.toggle-label {
+  color: var(--text-saved);
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 0.2s, color 0.2s;
+  user-select: none;
+}
+
+.toggle-label.active {
+  color: var(--text-editor);
+  opacity: 1;
+}
+
+.toggle-track {
+  position: relative;
+  width: 28px;
+  height: 16px;
+  background: var(--btn-bg);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toggle-thumb {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--text-editor);
+  top: 2px;
+  left: 2px;
+  transition: left 0.2s;
+}
+
+.toggle-track.signup .toggle-thumb {
+  left: 14px;
 }
 
 .auth-container input {
@@ -207,23 +251,20 @@ body {
   font-weight: 700;
   line-height: 22px;
   caret-color: var(--text-editor);
+  text-align: center;
 }
 
 .auth-container input::placeholder {
   color: var(--text-saved);
   opacity: 0.5;
+  text-align: center;
 }
 
-.auth-actions {
-  display: flex;
-  gap: 16px;
-  margin-top: 8px;
-}
-
-.auth-actions button {
+#auth-submit-btn {
   background: var(--btn-bg);
   border: none;
   padding: 0 4px;
+  margin-top: 8px;
   font-family: inherit;
   font-size: 14px;
   font-weight: 700;
@@ -233,8 +274,13 @@ body {
   transition: opacity 0.15s;
 }
 
-.auth-actions button:hover {
+#auth-submit-btn:hover {
   opacity: 0.6;
+}
+
+#auth-submit-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 #auth-error {
@@ -243,13 +289,26 @@ body {
   font-size: 13px;
   line-height: 20px;
   min-height: 20px;
+  text-align: center;
 }
 
-/* ── Logout button ── */
+/* ── Diary header ── */
+
+#diary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--gap);
+}
+
+#user-email {
+  color: var(--text-saved);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 22px;
+}
 
 #logout-btn {
-  display: block;
-  margin-top: 48px;
   background: none;
   border: none;
   padding: 0;
