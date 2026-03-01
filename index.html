@@ -19,9 +19,28 @@
           <span id="toggle-signup" class="toggle-label">Sign up</span>
         </div>
         <input id="auth-email" type="email" placeholder="email" autocomplete="email" />
-        <input id="auth-password" type="password" placeholder="password" autocomplete="current-password" />
+        <div id="password-row">
+          <input id="auth-password" type="password" placeholder="password" autocomplete="current-password" />
+          <button id="forgot-password-btn">Forgot password</button>
+        </div>
         <button id="auth-submit-btn">Log in</button>
         <p id="auth-error"></p>
+        <p id="auth-success"></p>
+      </div>
+    </div>
+
+    <div id="reset-screen" style="display:none">
+      <div class="auth-container">
+        <div id="reset-form">
+          <input id="reset-password" type="password" placeholder="new password" autocomplete="new-password" />
+          <input id="reset-confirm" type="password" placeholder="confirm password" autocomplete="new-password" />
+          <button id="reset-submit-btn">Confirm</button>
+          <p id="reset-error"></p>
+        </div>
+        <div id="reset-done" class="hidden">
+          <p id="reset-done-msg">Password changed.</p>
+          <button id="go-to-login-btn">Go to login</button>
+        </div>
       </div>
     </div>
 

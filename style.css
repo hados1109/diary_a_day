@@ -251,13 +251,12 @@ body {
   font-weight: 700;
   line-height: 22px;
   caret-color: var(--text-editor);
-  text-align: center;
+  text-align: left;
 }
 
 .auth-container input::placeholder {
   color: var(--text-saved);
   opacity: 0.5;
-  text-align: center;
 }
 
 #auth-submit-btn {
@@ -283,6 +282,49 @@ body {
   cursor: default;
 }
 
+#password-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-bottom: 1px solid var(--text-saved);
+  margin-bottom: 16px;
+}
+
+#password-row #auth-password {
+  flex: 1;
+  min-width: 0;
+  border-bottom: none;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+#password-row #auth-password::placeholder {
+  text-align: left;
+}
+
+#forgot-password-btn {
+  background: none;
+  border: none;
+  padding: 6px 0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-saved);
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 22px;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+#forgot-password-btn:hover {
+  opacity: 0.6;
+}
+
+#forgot-password-btn.hidden {
+  display: none;
+}
+
 #auth-error {
   margin-top: 12px;
   color: #b85c5c;
@@ -290,6 +332,91 @@ body {
   line-height: 20px;
   min-height: 20px;
   text-align: center;
+}
+
+#auth-success {
+  margin-top: 4px;
+  color: #5a7a3a;
+  font-size: 13px;
+  line-height: 20px;
+  min-height: 20px;
+  text-align: center;
+}
+
+/* ── Reset password screen ── */
+
+#reset-screen {
+  min-height: 100vh;
+  background-color: var(--bg);
+  align-items: center;
+  justify-content: center;
+}
+
+#reset-error {
+  margin-top: 12px;
+  color: #b85c5c;
+  font-size: 13px;
+  line-height: 20px;
+  min-height: 20px;
+  text-align: center;
+}
+
+#reset-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+#reset-done.hidden {
+  display: none;
+}
+
+#reset-done-msg {
+  color: var(--text-editor);
+  font-size: 14px;
+  line-height: 22px;
+  text-align: center;
+}
+
+#go-to-login-btn {
+  background: var(--btn-bg);
+  border: none;
+  padding: 0 4px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--btn-text);
+  line-height: 22px;
+  transition: opacity 0.15s;
+}
+
+#go-to-login-btn:hover {
+  opacity: 0.6;
+}
+
+#reset-submit-btn {
+  background: var(--btn-bg);
+  border: none;
+  padding: 0 4px;
+  margin-top: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--btn-text);
+  line-height: 22px;
+  transition: opacity 0.15s;
+}
+
+#reset-submit-btn:hover {
+  opacity: 0.6;
+}
+
+#reset-submit-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 /* ── Diary header ── */
