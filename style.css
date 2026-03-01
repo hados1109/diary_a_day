@@ -1,0 +1,180 @@
+@font-face {
+  font-family: 'Monograf';
+  src: url('fonts/Monograf Regular.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Monograf';
+  src: url('fonts/Monograf Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #F6F5EC;
+  --text-editor: #3A3015;
+  --text-saved: #866918;
+  --btn-bg: #F2EDD9;
+  --delete-bg: #F4E6E6;
+  --btn-text: #3A3015;
+  --gap: 32px;
+}
+
+html,
+body {
+  min-height: 100vh;
+  background-color: var(--bg);
+  color: var(--text-saved);
+  font-family: 'Monograf', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 22px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+/* ── Add button ── */
+
+#add-btn-wrap {
+  margin-bottom: var(--gap);
+}
+
+#add-btn {
+  display: block;
+  width: 100%;
+  background-color: var(--btn-bg);
+  border: none;
+  color: var(--btn-text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 22px;
+  padding: 10px 0;
+  text-align: center;
+  cursor: pointer;
+  letter-spacing: 0;
+  transition: opacity 0.15s;
+}
+
+#add-btn:hover {
+  opacity: 0.7;
+}
+
+#add-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* ── Editor ── */
+
+#editor {
+  margin-bottom: var(--gap);
+}
+
+#editor.hidden {
+  display: none;
+}
+
+.entry-date {
+  margin-bottom: 0;
+}
+
+#editor-input {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 0;
+  margin: 0;
+  color: var(--text-editor);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 22px;
+  overflow: hidden;
+  height: 22px;
+  caret-color: var(--text-editor);
+}
+
+.editor-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 0;
+}
+
+.editor-actions button {
+  background: var(--btn-bg);
+  border: none;
+  padding: 0 4px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--btn-text);
+  line-height: 22px;
+}
+
+.editor-actions button:hover {
+  opacity: 0.6;
+}
+
+#delete-btn {
+  background: var(--delete-bg);
+  color: var(--btn-text);
+}
+
+
+/* ── Saved entries ── */
+
+#entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.entry .entry-date {
+  margin-bottom: 0;
+}
+
+.entry .entry-date {
+  color: var(--text-saved);
+}
+
+.entry .entry-text {
+  color: var(--text-saved);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+#editor .entry-date {
+  color: var(--text-editor);
+}
+
+/* ── Utility ── */
+
+.hidden {
+  display: none;
+}

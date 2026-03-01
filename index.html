@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Positivity Note</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <div id="add-btn-wrap">
+        <button id="add-btn" title="New entry (N)">+</button>
+      </div>
+
+      <div id="editor" class="hidden">
+        <p id="editor-date" class="entry-date"></p>
+        <textarea id="editor-input" placeholder="" spellcheck="false"></textarea>
+        <div class="editor-actions">
+          <button id="save-btn">Save</button>
+          <button id="delete-btn">Delete</button>
+        </div>
+      </div>
+
+      <div id="entries-list"></div>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
