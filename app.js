@@ -16,6 +16,8 @@ import {
   query,
   orderBy,
   serverTimestamp,
+  limit,
+  startAfter,
 } from 'https://www.gstatic.com/firebasejs/11.3.1/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -64,7 +66,9 @@ const editorDate  = document.getElementById('editor-date');
 const editorInput = document.getElementById('editor-input');
 const saveBtn     = document.getElementById('save-btn');
 const deleteBtn   = document.getElementById('delete-btn');
-const entriesList = document.getElementById('entries-list');
+const entriesList  = document.getElementById('entries-list');
+const loadSentinel = document.getElementById('load-sentinel');
+const loadSpinner  = document.getElementById('load-spinner');
 
 // ── Helpers ──────────────────────────────────────────────
 
@@ -82,54 +86,121 @@ function entriesRef(uid) {
   return collection(db, 'users', uid, 'entries');
 }
 
-async function loadEntries(uid) {
-  const q    = query(entriesRef(uid), orderBy('createdAt', 'desc'));
-  const snap = await getDocs(q);
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
-
 async function addEntry(uid, date, text) {
   await addDoc(entriesRef(uid), { date, text, createdAt: serverTimestamp() });
 }
 
-// ── Render ────────────────────────────────────────────────
+// ── Pagination ────────────────────────────────────────────
 
-function render(entries) {
-  entriesList.innerHTML = '';
+const PAGE_SIZE  = 15;
+const BATCH_SIZE = 50;
 
+let _uid        = null;
+let _loadedDocs = [];
+let _lastSnap   = null;
+let _exhausted  = false;
+let _loading    = false;
+let _shownDates = 0;
+let _observer   = null;
+
+function _groupDocs(docs) {
   const groups = [];
   const seen   = new Map();
-
-  entries.forEach(entry => {
-    if (!seen.has(entry.date)) {
+  for (const e of docs) {
+    if (!seen.has(e.date)) {
       const texts = [];
-      seen.set(entry.date, texts);
-      groups.push({ date: entry.date, texts });
+      seen.set(e.date, texts);
+      groups.push({ date: e.date, texts });
     }
-    seen.get(entry.date).push(entry.text);
-  });
-
-  groups.forEach(group => {
-    const div = document.createElement('div');
-    div.className = 'entry';
-
-    const date = document.createElement('p');
-    date.className = 'entry-date';
-    date.textContent = group.date;
-
-    const text = document.createElement('p');
-    text.className = 'entry-text';
-    text.textContent = group.texts.slice().reverse().join('\n\n');
-
-    div.appendChild(date);
-    div.appendChild(text);
-    entriesList.appendChild(div);
-  });
+    seen.get(e.date).push(e.text);
+  }
+  return groups;
 }
 
-async function loadAndRender(uid) {
-  const entries = await loadEntries(uid);
-  render(entries);
+function _makeEntryEl({ date, texts }) {
+  const div    = document.createElement('div');
+  div.className = 'entry';
+  const dateEl = document.createElement('p');
+  dateEl.className = 'entry-date';
+  dateEl.textContent = date;
+  const textEl = document.createElement('p');
+  textEl.className = 'entry-text';
+  textEl.textContent = texts.slice().reverse().join('\n\n');
+  div.appendChild(dateEl);
+  div.appendChild(textEl);
+  return div;
+}
+
+async function _fetchBatch() {
+  const q = _lastSnap
+    ? query(entriesRef(_uid), orderBy('createdAt', 'desc'), startAfter(_lastSnap), limit(BATCH_SIZE))
+    : query(entriesRef(_uid), orderBy('createdAt', 'desc'), limit(BATCH_SIZE));
+  const snap = await getDocs(q);
+  if (snap.docs.length > 0) {
+    _lastSnap = snap.docs[snap.docs.length - 1];
+    _loadedDocs.push(...snap.docs.map(d => ({ id: d.id, ...d.data() })));
+  }
+  if (snap.docs.length < BATCH_SIZE) _exhausted = true;
+}
+
+async function _showMore() {
+  if (_loading) return;
+  _loading = true;
+  loadSpinner.classList.remove('hidden');
+  try {
+    // Keep fetching until we have PAGE_SIZE stable date groups buffered ahead
+    while (!_exhausted) {
+      const stableCount = _groupDocs(_loadedDocs).length - 1;
+      if (stableCount >= _shownDates + PAGE_SIZE) break;
+      await _fetchBatch();
+    }
+
+    const groups    = _groupDocs(_loadedDocs);
+    const available = _exhausted ? groups.length : Math.max(0, groups.length - 1);
+    const newCount  = Math.min(_shownDates + PAGE_SIZE, available);
+
+    for (let i = _shownDates; i < newCount; i++) {
+      entriesList.appendChild(_makeEntryEl(groups[i]));
+    }
+    _shownDates = newCount;
+
+    if (_exhausted && _shownDates >= groups.length) {
+      loadSpinner.classList.add('hidden');
+    }
+  } catch (err) {
+    console.error('Failed to load entries:', err);
+    loadSpinner.classList.add('hidden');
+  } finally {
+    _loading = false;
+  }
+
+  // If the sentinel is still in the viewport after rendering (page too short to
+  // scroll it away), the IntersectionObserver won't re-fire — so we trigger
+  // the next page ourselves.
+  if (!loadSpinner.classList.contains('hidden')) {
+    const rect = loadSentinel.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 100) {
+      requestAnimationFrame(_showMore);
+    }
+  }
+}
+
+function loadAndRender(uid) {
+  if (_observer) { _observer.disconnect(); _observer = null; }
+
+  _uid        = uid;
+  _loadedDocs = [];
+  _lastSnap   = null;
+  _exhausted  = false;
+  _loading    = false;
+  _shownDates = 0;
+  entriesList.innerHTML = '';
+  loadSpinner.classList.remove('hidden');
+
+  _observer = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) _showMore();
+  }, { rootMargin: '0px 0px 100px 0px' });
+  _observer.observe(loadSentinel);
 }
 
 // ── Auto-resize textarea ──────────────────────────────────

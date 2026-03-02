@@ -1,7 +1,7 @@
 @font-face {
   font-family: 'Monograf';
   src: url('fonts/Monograf Regular.ttf') format('truetype');
-  font-weight: 700;
+  font-weight: 400;
   font-style: normal;
 }
 
@@ -451,6 +451,31 @@ body {
 
 #logout-btn:hover {
   opacity: 0.8;
+}
+
+/* ── Load sentinel / spinner ── */
+
+#load-sentinel {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 16px;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(134, 105, 24, 0.25);
+  border-top-color: var(--text-saved);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+.spinner.hidden {
+  display: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ── Utility ── */
