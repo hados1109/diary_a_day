@@ -120,9 +120,14 @@ function _groupDocs(docs) {
 function _makeEntryEl({ date, texts }) {
   const div    = document.createElement('div');
   div.className = 'entry';
-  const dateEl = document.createElement('p');
+  const dateEl = document.createElement('div');
   dateEl.className = 'entry-date';
-  dateEl.textContent = date;
+  const dateLabel = document.createElement('span');
+  dateLabel.textContent = date;
+  const divider = document.createElement('div');
+  divider.className = 'entry-divider';
+  dateEl.appendChild(dateLabel);
+  dateEl.appendChild(divider);
   const textEl = document.createElement('p');
   textEl.className = 'entry-text';
   textEl.textContent = texts.slice().reverse().join('\n\n');

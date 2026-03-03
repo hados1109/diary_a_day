@@ -156,11 +156,22 @@ body {
 }
 
 .entry .entry-date {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 0;
+  overflow: hidden;
+  color: var(--text-saved);
 }
 
-.entry .entry-date {
-  color: var(--text-saved);
+.entry-divider {
+  flex: 1;
+  height: 10px;
+  background-image: url('tile.png');
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  opacity: 0.2;
+  min-width: 0;
 }
 
 .entry .entry-text {
