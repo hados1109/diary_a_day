@@ -70,6 +70,27 @@ const entriesList  = document.getElementById('entries-list');
 const loadSentinel = document.getElementById('load-sentinel');
 const loadSpinner  = document.getElementById('load-spinner');
 
+const toolbarInfoBtn     = document.getElementById('toolbar-info-btn');
+const aboutModal         = document.getElementById('about-modal');
+const aboutModalBackdrop = document.getElementById('about-modal-backdrop');
+const aboutModalClose    = document.getElementById('about-modal-close');
+
+const toolbarDiceBtn      = document.getElementById('toolbar-dice-btn');
+const memoryModal         = document.getElementById('memory-modal');
+const memoryModalBackdrop = document.getElementById('memory-modal-backdrop');
+const memoryModalClose    = document.getElementById('memory-modal-close');
+const memoryModalTitle    = document.getElementById('memory-modal-title');
+const memoryModalText     = document.getElementById('memory-modal-text');
+
+const toolbarEyeBtn  = document.getElementById('toolbar-eye-btn');
+const eyeIcon        = toolbarEyeBtn.querySelector('.fa-sharp');
+
+const toolbarGearBtn        = document.getElementById('toolbar-gear-btn');
+const settingsModal         = document.getElementById('settings-modal');
+const settingsModalBackdrop = document.getElementById('settings-modal-backdrop');
+const settingsModalClose    = document.getElementById('settings-modal-close');
+const themeSwatches         = document.querySelectorAll('.theme-swatch');
+
 // ── Helpers ──────────────────────────────────────────────
 
 function todayString() {
@@ -130,7 +151,14 @@ function _makeEntryEl({ date, texts }) {
   dateEl.appendChild(divider);
   const textEl = document.createElement('p');
   textEl.className = 'entry-text';
-  textEl.textContent = texts.slice().reverse().join('\n\n');
+  const originalText = texts.slice().reverse().join('\n\n');
+  textEl.dataset.original = originalText;
+  if (_censored) {
+    textEl.textContent = _scrambleText(originalText);
+    textEl.classList.add('scrambled');
+  } else {
+    textEl.textContent = originalText;
+  }
   div.appendChild(dateEl);
   div.appendChild(textEl);
   return div;
@@ -378,7 +406,155 @@ addBtn.addEventListener('click', openEditor);
 saveBtn.addEventListener('click', saveEntry);
 deleteBtn.addEventListener('click', closeEditor);
 
+function openAboutModal() {
+  aboutModal.classList.remove('hidden');
+  aboutModal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  aboutModalClose.focus();
+}
+
+function closeAboutModal() {
+  aboutModal.classList.add('hidden');
+  aboutModal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  toolbarInfoBtn?.focus();
+}
+
+toolbarInfoBtn.addEventListener('click', () => openAboutModal());
+aboutModalClose.addEventListener('click', () => closeAboutModal());
+aboutModalBackdrop.addEventListener('click', () => closeAboutModal());
+
+function aboutModalIsOpen() {
+  return aboutModal && !aboutModal.classList.contains('hidden');
+}
+
+// ── Memory modal (dice) ────────────────────────────────────
+
+function openMemoryModal() {
+  if (!_loadedDocs.length) return;
+  const entry = _loadedDocs[Math.floor(Math.random() * _loadedDocs.length)];
+  memoryModalTitle.textContent = `You smiled on ${entry.date}`;
+  memoryModalText.textContent  = entry.text;
+  memoryModal.classList.remove('hidden');
+  memoryModal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  memoryModalClose.focus();
+}
+
+function closeMemoryModal() {
+  memoryModal.classList.add('hidden');
+  memoryModal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  toolbarDiceBtn?.focus();
+}
+
+toolbarDiceBtn.addEventListener('click', () => openMemoryModal());
+memoryModalClose.addEventListener('click', () => closeMemoryModal());
+memoryModalBackdrop.addEventListener('click', () => closeMemoryModal());
+
+function memoryModalIsOpen() {
+  return memoryModal && !memoryModal.classList.contains('hidden');
+}
+
+// ── Settings modal (gear) ─────────────────────────────────
+
+function openSettingsModal() {
+  settingsModal.classList.remove('hidden');
+  settingsModal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  settingsModalClose.focus();
+}
+
+function closeSettingsModal() {
+  settingsModal.classList.add('hidden');
+  settingsModal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  toolbarGearBtn?.focus();
+}
+
+function settingsModalIsOpen() {
+  return settingsModal && !settingsModal.classList.contains('hidden');
+}
+
+toolbarGearBtn.addEventListener('click', () => openSettingsModal());
+settingsModalClose.addEventListener('click', () => closeSettingsModal());
+settingsModalBackdrop.addEventListener('click', () => closeSettingsModal());
+
+// ── Theme switching ───────────────────────────────────────
+
+const THEME_KEY = 'diary-theme';
+
+function applyTheme(name) {
+  document.documentElement.classList.toggle('theme-pink', name === 'pink');
+  themeSwatches.forEach(s => {
+    s.setAttribute('aria-pressed', String(s.dataset.theme === name));
+  });
+  try { localStorage.setItem(THEME_KEY, name); } catch (_) {}
+}
+
+themeSwatches.forEach(swatch => {
+  swatch.addEventListener('click', () => applyTheme(swatch.dataset.theme));
+});
+
+// Restore saved theme on load
+try {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved) applyTheme(saved);
+} catch (_) {}
+
+// ── Eye / scramble toggle ─────────────────────────────────
+
+const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?';
+const PRESERVE       = new Set([' ', '.', '\n']);
+let   _censored      = false;
+
+function _scrambleText(text) {
+  return Array.from(text).map(ch =>
+    PRESERVE.has(ch) ? ch : SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
+  ).join('');
+}
+
+function _applyScramble() {
+  document.querySelectorAll('.entry-text').forEach(el => {
+    el.textContent = _scrambleText(el.dataset.original || el.textContent);
+    el.classList.add('scrambled');
+  });
+}
+
+function _removeScramble() {
+  document.querySelectorAll('.entry-text').forEach(el => {
+    el.textContent = el.dataset.original || el.textContent;
+    el.classList.remove('scrambled');
+  });
+}
+
+toolbarEyeBtn.addEventListener('click', () => {
+  _censored = !_censored;
+  if (_censored) {
+    _applyScramble();
+    eyeIcon.classList.replace('fa-sharp-eye', 'fa-sharp-eye-slash');
+    toolbarEyeBtn.setAttribute('aria-label', 'Show notes');
+  } else {
+    _removeScramble();
+    eyeIcon.classList.replace('fa-sharp-eye-slash', 'fa-sharp-eye');
+    toolbarEyeBtn.setAttribute('aria-label', 'Hide notes');
+  }
+});
+
 document.addEventListener('keydown', e => {
+  if (aboutModalIsOpen()) {
+    if (e.key === 'Escape') { e.preventDefault(); closeAboutModal(); }
+    return;
+  }
+  if (memoryModalIsOpen()) {
+    if (e.key === 'Escape') { e.preventDefault(); closeMemoryModal(); }
+    return;
+  }
+  if (settingsModalIsOpen()) {
+    if (e.key === 'Escape') { e.preventDefault(); closeSettingsModal(); }
+    return;
+  }
+
   if (diary.classList.contains('hidden')) return;
 
   const tag        = document.activeElement.tagName.toLowerCase();

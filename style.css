@@ -12,6 +12,14 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Font Awesome 6 Sharp Regular';
+  src: url('fonts/fa6-sharp-regular-400.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
 *,
 *::before,
 *::after {
@@ -28,6 +36,19 @@
   --delete-bg: #F4E6E6;
   --btn-text: #3A3015;
   --gap: 32px;
+  --tile: url('tile.png');
+  --backdrop: rgba(246, 245, 236, 0.8);
+}
+
+:root.theme-pink {
+  --bg: #FAEBED;
+  --text-editor: #D55D6C;
+  --text-saved: #D55D6C;
+  --btn-bg: #FDDDE1;
+  --delete-bg: #FDDDE1;
+  --btn-text: #D55D6C;
+  --tile: url('tile2.png');
+  --backdrop: rgba(250, 235, 237, 0.8);
 }
 
 html,
@@ -48,6 +69,216 @@ body {
   padding: 48px 24px 80px;
 }
 
+/* ── Diary toolbar (Font Awesome 6 Sharp Regular) ── */
+
+.diary-toolbar {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.icon-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 10px 4px;
+  background-color: var(--btn-bg);
+  border: none;
+  border-radius: 4px;
+  color: var(--text-saved);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.icon-btn:hover {
+  opacity: 0.7;
+}
+
+.icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.fa-sharp {
+  display: block;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.fa-sharp::before {
+  font-family: 'Font Awesome 6 Sharp Regular', monospace;
+  font-weight: 400;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  text-rendering: auto;
+}
+
+.fa-sharp-circle-info::before {
+  content: '\f05a';
+}
+
+.fa-sharp-dice::before {
+  content: '\f522';
+}
+
+.fa-sharp-eye::before {
+  content: '\f06e';
+}
+
+.fa-sharp-gear::before {
+  content: '\f013';
+}
+
+.fa-sharp-plus::before {
+  content: '\f067';
+}
+
+.fa-sharp-xmark::before {
+  content: '\f00d';
+}
+
+.fa-sharp-eye-slash::before {
+  content: '\f070';
+}
+
+/* ── Shared modal ── */
+
+.diary-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  pointer-events: none;
+}
+
+.diary-modal.hidden {
+  display: none;
+}
+
+.diary-modal:not(.hidden) {
+  pointer-events: auto;
+}
+
+.diary-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--backdrop);
+}
+
+.diary-modal-dialog {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg);
+  border: 1px solid var(--text-saved);
+  box-shadow: 8px 8px 0 var(--text-saved);
+  text-align: left;
+}
+
+.diary-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 20px 0;
+}
+
+.diary-modal-title {
+  margin: 0;
+  font: inherit;
+  color: var(--text-saved);
+  text-align: left;
+}
+
+.diary-modal-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: -4px -4px 0 0;
+  padding: 4px;
+  background: none;
+  border: none;
+  color: var(--text-saved);
+  cursor: pointer;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+
+.diary-modal-close:hover {
+  opacity: 0.6;
+}
+
+.diary-modal-close .fa-sharp {
+  font-size: 16px;
+}
+
+.diary-modal-body {
+  padding: 20px;
+  text-align: left;
+  color: var(--text-saved);
+}
+
+.diary-modal-body p {
+  margin: 0;
+  font: inherit;
+}
+
+/* ── Settings modal ── */
+
+.settings-body {
+  padding: 20px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-label {
+  color: var(--text-saved);
+  font: inherit;
+}
+
+.theme-swatches {
+  display: flex;
+  gap: 8px;
+}
+
+.theme-swatch {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--text-saved);
+  border-radius: 0;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  padding: 0;
+}
+
+.theme-swatch:hover {
+  opacity: 0.7;
+}
+
+.theme-swatch[aria-pressed="true"] {
+  box-shadow: 2px 2px 0 var(--text-saved);
+}
+
+#swatch-default {
+  background-color: #F6F5EC;
+}
+
+#swatch-pink {
+  background-color: #FAEBED;
+}
+
 /* ── Add button ── */
 
 #add-btn-wrap {
@@ -55,20 +286,21 @@ body {
 }
 
 #add-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   background-color: var(--btn-bg);
   border: none;
-  color: var(--btn-text);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 22px;
+  border-radius: 4px;
+  color: var(--text-saved);
   padding: 10px 0;
-  text-align: center;
   cursor: pointer;
-  letter-spacing: 0;
   transition: opacity 0.15s;
+}
+
+#add-btn .fa-sharp {
+  font-size: 16px;
 }
 
 #add-btn:hover {
@@ -122,6 +354,7 @@ body {
 .editor-actions button {
   background: var(--btn-bg);
   border: none;
+  border-radius: 4px;
   padding: 0 4px;
   font-family: inherit;
   font-size: 14px;
@@ -167,7 +400,7 @@ body {
 .entry-divider {
   flex: 1;
   height: 10px;
-  background-image: url('tile.png');
+  background-image: var(--tile);
   background-repeat: repeat-x;
   background-size: auto 100%;
   opacity: 0.4;
@@ -178,6 +411,10 @@ body {
   color: var(--text-saved);
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.entry .entry-text.scrambled {
+  opacity: 0.4;
 }
 
 #editor .entry-date {

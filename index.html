@@ -44,14 +44,111 @@
       </div>
     </div>
 
+    <div id="about-modal" class="diary-modal hidden" aria-hidden="true">
+      <div class="diary-modal-backdrop" id="about-modal-backdrop" aria-hidden="true"></div>
+      <div
+        class="diary-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="about-modal-title"
+      >
+        <header class="diary-modal-header">
+          <h2 id="about-modal-title" class="diary-modal-title">About</h2>
+          <button type="button" id="about-modal-close" class="diary-modal-close" aria-label="Close">
+            <span class="fa-sharp fa-sharp-xmark" aria-hidden="true"></span>
+          </button>
+        </header>
+        <div class="diary-modal-body">
+          <p>Life moves fast, and the small good moments are easy to forget. This app is a quiet place to notice them—not to perform or be perfect, just to remember that something, even tiny, made you smile today.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="memory-modal" class="diary-modal hidden" aria-hidden="true">
+      <div class="diary-modal-backdrop" id="memory-modal-backdrop" aria-hidden="true"></div>
+      <div
+        class="diary-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="memory-modal-title"
+      >
+        <header class="diary-modal-header">
+          <h2 id="memory-modal-title" class="diary-modal-title"></h2>
+          <button type="button" id="memory-modal-close" class="diary-modal-close" aria-label="Close">
+            <span class="fa-sharp fa-sharp-xmark" aria-hidden="true"></span>
+          </button>
+        </header>
+        <div class="diary-modal-body">
+          <p id="memory-modal-text"></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="settings-modal" class="diary-modal hidden" aria-hidden="true">
+      <div class="diary-modal-backdrop" id="settings-modal-backdrop" aria-hidden="true"></div>
+      <div
+        class="diary-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-modal-title"
+      >
+        <header class="diary-modal-header">
+          <h2 id="settings-modal-title" class="diary-modal-title">Settings</h2>
+          <button type="button" id="settings-modal-close" class="diary-modal-close" aria-label="Close">
+            <span class="fa-sharp fa-sharp-xmark" aria-hidden="true"></span>
+          </button>
+        </header>
+        <div class="diary-modal-body settings-body">
+          <div class="settings-row">
+            <span class="settings-label">Theme</span>
+            <div class="theme-swatches" role="radiogroup" aria-label="Theme">
+              <button
+                type="button"
+                class="theme-swatch"
+                id="swatch-default"
+                data-theme="default"
+                aria-label="Default theme"
+                aria-pressed="true"
+              ></button>
+              <button
+                type="button"
+                class="theme-swatch"
+                id="swatch-pink"
+                data-theme="pink"
+                aria-label="Pink theme"
+                aria-pressed="false"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <main class="container hidden" id="diary">
       <div id="diary-header">
         <span id="user-email"></span>
-        <button id="logout-btn">Sign out</button>
+        <button id="logout-btn">Log out</button>
+      </div>
+
+      <div id="diary-toolbar" class="diary-toolbar" aria-label="Toolbar">
+        <button type="button" id="toolbar-info-btn" class="icon-btn" title="Info" aria-label="Info">
+          <span class="fa-sharp fa-sharp-circle-info" aria-hidden="true"></span>
+        </button>
+        <button type="button" id="toolbar-dice-btn" class="icon-btn" title="Dice" aria-label="Dice">
+          <span class="fa-sharp fa-sharp-dice" aria-hidden="true"></span>
+        </button>
+        <button type="button" id="toolbar-eye-btn" class="icon-btn" title="Eye" aria-label="Eye">
+          <span class="fa-sharp fa-sharp-eye" aria-hidden="true"></span>
+        </button>
+        <button type="button" id="toolbar-gear-btn" class="icon-btn" title="Settings" aria-label="Settings">
+          <span class="fa-sharp fa-sharp-gear" aria-hidden="true"></span>
+        </button>
       </div>
 
       <div id="add-btn-wrap">
-        <button id="add-btn" title="New entry (N)">+</button>
+        <button type="button" id="add-btn" title="New entry (N)" aria-label="New entry">
+          <span class="fa-sharp fa-sharp-plus" aria-hidden="true"></span>
+        </button>
       </div>
 
       <div id="editor" class="hidden">
