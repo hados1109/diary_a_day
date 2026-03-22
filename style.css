@@ -30,11 +30,11 @@
 
 :root {
   --bg: #F6F5EC;
-  --text-editor: #3A3015;
+  --text-editor: #272727;
   --text-saved: #866918;
   --btn-bg: #F2EDD9;
   --delete-bg: #F4E6E6;
-  --btn-text: #3A3015;
+  --btn-text: #272727;
   --gap: 32px;
   --tile: url('tile.png');
   --backdrop: rgba(246, 245, 236, 0.8);
@@ -45,7 +45,7 @@
   --text-editor: #D55D6C;
   --text-saved: #D55D6C;
   --btn-bg: #FDDDE1;
-  --delete-bg: #FDDDE1;
+  --delete-bg: #F4E6E6;
   --btn-text: #D55D6C;
   --tile: url('tile2.png');
   --backdrop: rgba(250, 235, 237, 0.8);
@@ -335,14 +335,14 @@ body {
   resize: none;
   padding: 0;
   margin: 0;
-  color: var(--text-editor);
+  color: #272727;
   font-family: inherit;
   font-size: 14px;
   font-weight: 700;
   line-height: 22px;
   overflow: hidden;
   height: 22px;
-  caret-color: var(--text-editor);
+  caret-color: #272727;
 }
 
 .editor-actions {
@@ -368,9 +368,14 @@ body {
   opacity: 0.6;
 }
 
+/* Save / Delete labels: same dark brown as default theme; backgrounds stay themed */
+#save-btn {
+  color: #272727;
+}
+
 #delete-btn {
   background: var(--delete-bg);
-  color: var(--btn-text);
+  color: #272727;
 }
 
 
@@ -418,7 +423,7 @@ body {
 }
 
 #editor .entry-date {
-  color: var(--text-editor);
+  color: #272727;
 }
 
 /* ── Auth screen ── */
