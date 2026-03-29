@@ -9,8 +9,5 @@
   },
   "keywords": ["diary", "firebase", "webapp"],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@vercel/analytics": "^1.4.1"
-  }
+  "license": "ISC"
 }
