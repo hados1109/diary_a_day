@@ -101,6 +101,22 @@ function todayString() {
   return `${dd}/${mm}/${yyyy}`;
 }
 
+function yesterdayString() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  const dd   = String(d.getDate()).padStart(2, '0');
+  const mm   = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+function editorDateAndBody(trimmed) {
+  if (trimmed.startsWith('--')) {
+    return { date: yesterdayString(), body: trimmed.slice(2).trim() };
+  }
+  return { date: todayString(), body: trimmed };
+}
+
 // ── Firestore ─────────────────────────────────────────────
 
 function entriesRef(uid) {
@@ -124,6 +140,16 @@ let _loading    = false;
 let _shownDates = 0;
 let _observer   = null;
 
+function _displayDateMs(ddMmYyyy) {
+  const parts = String(ddMmYyyy).split('/');
+  if (parts.length !== 3) return 0;
+  const dd = Number(parts[0]);
+  const mm = Number(parts[1]);
+  const yyyy = Number(parts[2]);
+  if (!yyyy || !mm || !dd) return 0;
+  return new Date(yyyy, mm - 1, dd).getTime();
+}
+
 function _groupDocs(docs) {
   const groups = [];
   const seen   = new Map();
@@ -135,6 +161,7 @@ function _groupDocs(docs) {
     }
     seen.get(e.date).push(e.text);
   }
+  groups.sort((a, b) => _displayDateMs(b.date) - _displayDateMs(a.date));
   return groups;
 }
 
@@ -243,15 +270,23 @@ function autoResize() {
   editorInput.style.height = editorInput.scrollHeight + 'px';
 }
 
-editorInput.addEventListener('input', autoResize);
+function syncEditorDateLabel() {
+  const trimmed = editorInput.value.trim();
+  editorDate.textContent = trimmed.startsWith('--') ? yesterdayString() : todayString();
+}
+
+editorInput.addEventListener('input', () => {
+  autoResize();
+  syncEditorDateLabel();
+});
 
 // ── Editor open / close ───────────────────────────────────
 
 function openEditor() {
   if (!editor.classList.contains('hidden')) return;
-  editorDate.textContent = todayString();
   editorInput.value = '';
   editorInput.style.height = '22px';
+  syncEditorDateLabel();
   editor.classList.remove('hidden');
   editorInput.focus();
 }
@@ -267,11 +302,13 @@ function closeEditor() {
 // ── Save ──────────────────────────────────────────────────
 
 async function saveEntry() {
-  const text = editorInput.value.trim();
-  if (!text) return;
+  const trimmed = editorInput.value.trim();
+  if (!trimmed) return;
   const uid = auth.currentUser?.uid;
   if (!uid) return;
-  await addEntry(uid, todayString(), text);
+  const { date, body } = editorDateAndBody(trimmed);
+  if (!body) return;
+  await addEntry(uid, date, body);
   closeEditor();
 }
 

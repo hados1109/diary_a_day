@@ -231,6 +231,43 @@ body {
   font: inherit;
 }
 
+.diary-modal-section-title {
+  margin: 1.35em 0 0.45em;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-saved);
+  text-align: left;
+}
+
+.diary-modal-list {
+  list-style: none;
+  counter-reset: modal-howto;
+  margin: 0;
+  padding-left: 0;
+  font: inherit;
+}
+
+.diary-modal-list li {
+  counter-increment: modal-howto;
+  margin: 0.35em 0;
+}
+
+.diary-modal-list li::before {
+  content: counter(modal-howto) ". ";
+  font-weight: inherit;
+}
+
+.diary-modal-shortcuts {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  font: inherit;
+}
+
+.diary-modal-shortcuts li {
+  margin: 0.35em 0;
+}
+
 /* ── Settings modal ── */
 
 .settings-body {
