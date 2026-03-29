@@ -1,0 +1,16 @@
+{
+  "name": "diary-a-day",
+  "version": "1.0.0",
+  "description": "A daily diary app to track moments that made you smile",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "build": "echo 'No build step required for static site'"
+  },
+  "keywords": ["diary", "firebase", "webapp"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  }
+}
